@@ -113,6 +113,16 @@ class ContactData extends Component {
             isValid = value.length <= rules.maxLength && isValid;
         }
 
+        if (rules.isEmail) {
+            const pattern = /[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?/;
+            isValid = pattern.test(value) && isValid
+        }
+
+        if (rules.isNumeric) {
+            const pattern = /^\d+$/;
+            isValid = pattern.test(value) && isValid
+        }
+
         return isValid;
     }
 
@@ -127,9 +137,10 @@ class ContactData extends Component {
         const order = {
             ingredients: this.props.ing,
             price: this.props.price,
-            orderForm: formData
+            orderForm: formData,
+            userId: this.props.userId
         };
-        this.props.onOrderBurger(order);
+        this.props.onOrderBurger(order, this.props.token); 
     };
 
     inputChangedHandler = (event, inputIdentifier) => {
@@ -195,13 +206,15 @@ const mapStateToProps = state => {
     return {
         ing: state.burgerBuilder.ingredients,
         price: state.burgerBuilder.totalPrice,
-        loading: state.order.loading
+        loading: state.order.loading,
+        token: state.authentication.token,
+        userId: state.authentication.userId
     }
 };
 
 const mapDispatchToProps = dispatch => {
     return {
-        onOrderBurger: (orderData) => dispatch(actions.purchaseBurger(orderData))
+        onOrderBurger: (orderData, token) => dispatch(actions.purchaseBurger(orderData, token))
     }
 }
 
